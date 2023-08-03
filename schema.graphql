@@ -1,0 +1,201 @@
+type PawnshopEntity @entity {
+  id: ID!
+  feeRecipient: String!
+  platformFee: BigInt!
+  positionDepositAmount: BigInt!
+
+  timestamp: BigInt!
+  createAtBlock: BigInt!
+}
+
+type PositionEntity @entity {
+  # posId
+  id: ID!
+
+  borrower: String!
+  depositToken: TokenEntity!
+  minAuctionAmount: BigInt!
+  open: Boolean!
+  info: PositionInfoEntity
+  collateral: PositionCollateralEntity!
+  acquired: PositionAcquiredEntity!
+  execution: PositionExecutionEntity
+  bids: [BidEntity!]!
+  apr: BigDecimal
+
+  startPrice: BigDecimal!
+
+  type: PositionType!
+  status: PositionStatus!
+  pawnshop: PawnshopEntity!
+
+  timestamp: BigInt!
+  createAtBlock: BigInt!
+}
+
+type PositionInfoEntity @entity {
+  id: ID!
+
+  posDurationBlocks: BigInt!
+  posFee: BigInt!
+  createdBlock: BigInt!
+  createdTs: BigInt!
+}
+
+type PositionCollateralEntity @entity {
+  id: ID!
+
+  collateralToken: TokenEntity!
+  collateralType: Int!
+  collateralAmount: BigInt!
+  tokenName: String
+  tokenSymbol: String
+  collectionName: String
+  tokenId: BigInt!
+}
+
+type PositionAcquiredEntity @entity {
+  id: ID!
+
+  acquiredToken: TokenEntity!
+  tokenName: String
+  tokenSymbol: String
+  acquiredAmount: BigInt!
+}
+
+type PositionExecutionEntity @entity {
+  id: ID!
+
+  lender: String!
+  posStartBlock: BigInt!
+  posStartTs: BigInt!
+  posEndTs: BigInt!
+}
+
+type PositionActionEntity @entity {
+  id: ID!
+
+  position: PositionEntity!
+  action: ActionType!
+  collateralToken: TokenEntity
+  tx: String!
+  price: BigInt
+  from: String
+  to: String
+
+  timestamp: BigInt!
+  createAtBlock: BigInt!
+}
+
+type TokenEntity @entity {
+  id: ID!
+
+  symbol: String!
+  decimals: Int!
+  name: String!
+  isErc721: Boolean!
+  tokenUri: String
+  contractAddress: String
+  totalSupply: BigInt
+  tokenId: BigInt
+  price: BigDecimal
+  collection: CollectionEntity
+}
+
+type CollectionEntity @entity {
+  id: ID!
+  name: String
+  symbol: String
+  totalSupply: BigInt!
+}
+
+type BidEntity @entity {
+  id: ID!
+
+  position: PositionEntity!
+  lender: String!
+  amount: BigInt!
+  open: Boolean!
+
+  timestamp: BigInt!
+  createAtBlock: BigInt!
+}
+
+type BidActionEntity @entity {
+  id: ID!
+
+  bid: BidEntity!
+  action: ActionType!
+
+  timestamp: BigInt!
+  createAtBlock: BigInt!
+}
+
+enum ActionType {
+  OPEN_POSITION,
+  CLAIM_POSITION,
+  CLOSE_POSITION,
+  REDEEM_POSITION,
+  BID_ACCEPT,
+  BID_CLOSE,
+  BID_OPEN,
+  BID_EXECUTE,
+}
+
+enum PositionType {
+  Sale,
+  Auction,
+  Loan,
+  LoanAuction
+}
+
+enum PositionStatus {
+  Active,
+  Execute,
+  Close
+}
+
+type FeeEarnedEntity @entity {
+  id: ID!
+
+  value: BigInt!
+}
+
+type FeeEarnedHistoryEntity @entity {
+  id: ID!
+
+  position: PositionEntity!
+  feeAmount: BigInt!
+
+  timestamp: BigInt!
+  createAtBlock: BigInt!
+}
+
+type PlaftformFeeHistoryEntity @entity {
+  id: ID!
+
+  newFee: BigInt!
+  oldFee: BigInt!
+
+  timestamp: BigInt!
+  createAtBlock: BigInt!
+}
+
+type TvlEntity @entity {
+  id: ID!
+  value: BigDecimal!
+  collateralValue: BigDecimal!
+  bidsValue: BigDecimal!
+  depositTokenValue: BigDecimal!
+  activePositions: [PositionEntity!]
+}
+
+type TvlHistoryEntity @entity {
+  id: ID!
+  value: BigDecimal!
+  collateralValue: BigDecimal!
+  bidsValue: BigDecimal!
+  depositTokenValue: BigDecimal!
+  timestamp: BigInt!
+  createAtBlock: BigInt!
+}

@@ -1,0 +1,54 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: PawnShopContract
+    network: mumbai
+    source:
+      address: "0xa7521861891808CfD53C65a525E3aB715a57AdD0"
+      abi: PawnShopContract
+      startBlock: 38558229
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - AuctionBidAccepted
+        - AuctionBidClosed
+        - AuctionBidOpened
+        - BidExecuted
+        - PositionClaimed
+        - PositionClosed
+        - PositionOpened
+        - PositionRedeemed
+        - UpdateController
+      abis:
+        - name: PawnShopContract
+          file: ./abis/PawnShopContract.json
+        - name: ERC20
+          file: ./abis/ERC20Contract.json
+        - name: ERC721
+          file: ./abis/ERC721Contract.json
+        - name: PriceCalculator
+          file: ./abis/PriceCalculator.json
+      eventHandlers:
+        - event: AuctionBidAccepted(indexed address,uint256,uint256)
+          handler: handleAuctionBidAccepted
+        - event: AuctionBidClosed(uint256,uint256)
+          handler: handleAuctionBidClosed
+        - event: AuctionBidOpened(uint256,uint256,uint256,address)
+          handler: handleAuctionBidOpened
+        - event: BidExecuted(uint256,uint256,uint256,address,address)
+          handler: handleBidExecuted
+        - event: PositionClaimed(indexed address,uint256)
+          handler: handlePositionClaimed
+        - event: PositionClosed(indexed address,uint256)
+          handler: handlePositionClosed
+        - event: PositionOpened(indexed address,uint256,address,uint256,uint256,address,uint256,uint256,uint256)
+          handler: handlePositionOpened
+        - event: PositionRedeemed(indexed address,uint256)
+          handler: handlePositionRedeemed
+        - event: PlatformFeeChanged(uint256,uint256)
+          handler: handlePlatformFeeChanged
+      file: ./src/pawn-shop.listener.ts
