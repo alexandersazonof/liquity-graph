@@ -1,201 +1,335 @@
-type PawnshopEntity @entity {
-  id: ID!
-  feeRecipient: String!
-  platformFee: BigInt!
-  positionDepositAmount: BigInt!
+type Global @entity {
+    "There should be only one System entity with an ID of 'only'"
+    id: ID!
 
-  timestamp: BigInt!
-  createAtBlock: BigInt!
+    systemStateCount: Int!
+    transactionCount: Int!
+    changeCount: Int!
+    liquidationCount: Int!
+    redemptionCount: Int!
+
+    numberOfOpenTroves: Int!
+    numberOfLiquidatedTroves: Int!
+    numberOfRedeemedTroves: Int!
+    numberOfTrovesClosedByOwner: Int!
+    totalNumberOfTroves: Int!
+
+    totalNumberOfLQTYStakes: Int!
+    numberOfActiveLQTYStakes: Int!
+
+    "Total amount of LUSD paid as borrowing fees"
+    totalBorrowingFeesPaid: BigDecimal!
+    "Total amount of ETH paid as redemption fees"
+    totalRedemptionFeesPaid: BigDecimal!
+
+    "Total redistributed per-stake collateral"
+    rawTotalRedistributedCollateral: BigInt!
+
+    "Total redistributed per-stake debt"
+    rawTotalRedistributedDebt: BigInt!
+
+    currentSystemState: SystemState
+
+    "Only used internally as temporary storage. Will always be null in queries"
+    currentLiquidation: Liquidation
+
+    "Only used internally as temporary storage. Will always be null in queries"
+    currentRedemption: Redemption
+
+    "Only used internally as temporary storage. Will always be null in queries"
+    tmpDepositUpdate: BigInt
 }
 
-type PositionEntity @entity {
-  # posId
-  id: ID!
+type SystemState @entity {
+    "Sequence number as an ID (string)"
+    id: ID!
 
-  borrower: String!
-  depositToken: TokenEntity!
-  minAuctionAmount: BigInt!
-  open: Boolean!
-  info: PositionInfoEntity
-  collateral: PositionCollateralEntity!
-  acquired: PositionAcquiredEntity!
-  execution: PositionExecutionEntity
-  bids: [BidEntity!]!
-  apr: BigDecimal
+    "Can be used to chronologically sort SystemStates"
+    sequenceNumber: Int!
 
-  startPrice: BigDecimal!
+    price: BigDecimal
 
-  type: PositionType!
-  status: PositionStatus!
-  pawnshop: PawnshopEntity!
+    totalCollateral: BigDecimal!
+    totalDebt: BigDecimal!
+    totalCollateralRatio: BigDecimal
 
-  timestamp: BigInt!
-  createAtBlock: BigInt!
+    tokensInStabilityPool: BigDecimal!
+    collSurplusPoolBalance: BigDecimal!
+    totalLQTYTokensStaked: BigDecimal!
+
+    cause: Change @derivedFrom(field: "systemStateAfter")
 }
 
-type PositionInfoEntity @entity {
-  id: ID!
+type User @entity {
+    "User's Ethereum address as a hex-string"
+    id: ID!
 
-  posDurationBlocks: BigInt!
-  posFee: BigInt!
-  createdBlock: BigInt!
-  createdTs: BigInt!
+    trove: Trove
+    stabilityDeposit: StabilityDeposit
+    stake: LqtyStake
+    frontend: Frontend
+
+    collSurplus: BigDecimal!
+    collSurplusChanges: [CollSurplusChange!]! @derivedFrom(field: "user")
+
+    liquidations: [Liquidation!]! @derivedFrom(field: "liquidator")
+    redemptions: [Redemption!]! @derivedFrom(field: "redeemer")
+
+    balances: [TokenBalance!] @derivedFrom(field: "owner")
+    allowances: [TokenAllowance!] @derivedFrom(field: "owner")
 }
 
-type PositionCollateralEntity @entity {
-  id: ID!
-
-  collateralToken: TokenEntity!
-  collateralType: Int!
-  collateralAmount: BigInt!
-  tokenName: String
-  tokenSymbol: String
-  collectionName: String
-  tokenId: BigInt!
+enum TroveStatus {
+    open
+    closedByOwner
+    closedByLiquidation
+    closedByRedemption
 }
 
-type PositionAcquiredEntity @entity {
-  id: ID!
+type Trove @entity {
+    "Owner's ID + '-' + an incremented integer"
+    id: ID!
 
-  acquiredToken: TokenEntity!
-  tokenName: String
-  tokenSymbol: String
-  acquiredAmount: BigInt!
+    owner: User!
+    status: TroveStatus!
+
+    collateral: BigDecimal!
+    debt: BigDecimal!
+
+    changes: [TroveChange!]! @derivedFrom(field: "trove")
+
+    rawCollateral: BigInt!
+    rawDebt: BigInt!
+    rawStake: BigInt!
+
+    "The value of total redistributed per-stake collateral the last time rewards were applied"
+    rawSnapshotOfTotalRedistributedCollateral: BigInt!
+
+    "The value of total redistributed per-stake debt the last time rewards were applied"
+    rawSnapshotOfTotalRedistributedDebt: BigInt!
+
+    "Ordering by this field will result in the same ordering as collateral ratio (except reversed)"
+    collateralRatioSortKey: BigInt
 }
 
-type PositionExecutionEntity @entity {
-  id: ID!
+type StabilityDeposit @entity {
+    "Owner's ID + '-' + an incremented integer"
+    id: ID!
 
-  lender: String!
-  posStartBlock: BigInt!
-  posStartTs: BigInt!
-  posEndTs: BigInt!
+    owner: User!
+
+    depositedAmount: BigDecimal!
+
+    frontend: Frontend
+
+    changes: [StabilityDepositChange!]! @derivedFrom(field: "stabilityDeposit")
 }
 
-type PositionActionEntity @entity {
-  id: ID!
+type Transaction @entity {
+    "Transaction hash"
+    id: ID!
 
-  position: PositionEntity!
-  action: ActionType!
-  collateralToken: TokenEntity
-  tx: String!
-  price: BigInt
-  from: String
-  to: String
+    "Can be used to correctly sort transactions even if they were mined in the same block"
+    sequenceNumber: Int!
 
-  timestamp: BigInt!
-  createAtBlock: BigInt!
+    blockNumber: Int!
+
+    "Timestamp of block that included this transaction (seconds since epoch)"
+    timestamp: Int!
+
+    changes: [Change!]! @derivedFrom(field: "transaction")
 }
 
-type TokenEntity @entity {
-  id: ID!
+interface Change {
+    "Same as sequence number, but as an ID (string)"
+    id: ID!
 
-  symbol: String!
-  decimals: Int!
-  name: String!
-  isErc721: Boolean!
-  tokenUri: String
-  contractAddress: String
-  totalSupply: BigInt
-  tokenId: BigInt
-  price: BigDecimal
-  collection: CollectionEntity
+    "Can be used to correctly sort changes even if they were made by the same transaction"
+    sequenceNumber: Int!
+
+    "Transaction that made this change"
+    transaction: Transaction!
+
+    systemStateBefore: SystemState!
+    systemStateAfter: SystemState!
 }
 
-type CollectionEntity @entity {
-  id: ID!
-  name: String
-  symbol: String
-  totalSupply: BigInt!
+enum TroveOperation {
+    openTrove
+    closeTrove
+    adjustTrove
+    accrueRewards
+    liquidateInNormalMode
+    liquidateInRecoveryMode
+    redeemCollateral
 }
 
-type BidEntity @entity {
-  id: ID!
+type TroveChange implements Change @entity {
+    id: ID!
+    sequenceNumber: Int!
+    transaction: Transaction!
+    systemStateBefore: SystemState!
+    systemStateAfter: SystemState!
 
-  position: PositionEntity!
-  lender: String!
-  amount: BigInt!
-  open: Boolean!
+    trove: Trove!
+    troveOperation: TroveOperation!
 
-  timestamp: BigInt!
-  createAtBlock: BigInt!
+    collateralBefore: BigDecimal!
+    collateralChange: BigDecimal!
+    collateralAfter: BigDecimal!
+
+    debtBefore: BigDecimal!
+    debtChange: BigDecimal!
+    debtAfter: BigDecimal!
+
+    borrowingFee: BigDecimal
+
+    collateralRatioBefore: BigDecimal
+    collateralRatioAfter: BigDecimal
+
+    liquidation: Liquidation
+    redemption: Redemption
 }
 
-type BidActionEntity @entity {
-  id: ID!
-
-  bid: BidEntity!
-  action: ActionType!
-
-  timestamp: BigInt!
-  createAtBlock: BigInt!
+enum StabilityDepositOperation {
+    depositTokens
+    withdrawTokens
+    withdrawCollateralGain
 }
 
-enum ActionType {
-  OPEN_POSITION,
-  CLAIM_POSITION,
-  CLOSE_POSITION,
-  REDEEM_POSITION,
-  BID_ACCEPT,
-  BID_CLOSE,
-  BID_OPEN,
-  BID_EXECUTE,
+
+type StabilityDepositChange implements Change @entity {
+    id: ID!
+    sequenceNumber: Int!
+    transaction: Transaction!
+    systemStateBefore: SystemState!
+    systemStateAfter: SystemState!
+
+    stabilityDeposit: StabilityDeposit!
+    stabilityDepositOperation: StabilityDepositOperation!
+
+    depositedAmountBefore: BigDecimal!
+    depositedAmountChange: BigDecimal!
+    depositedAmountAfter: BigDecimal!
+
+    collateralGain: BigDecimal
 }
 
-enum PositionType {
-  Sale,
-  Auction,
-  Loan,
-  LoanAuction
+type PriceChange implements Change @entity {
+    id: ID!
+    sequenceNumber: Int!
+    transaction: Transaction!
+    systemStateBefore: SystemState!
+    systemStateAfter: SystemState!
+
+    priceChange: BigDecimal!
 }
 
-enum PositionStatus {
-  Active,
-  Execute,
-  Close
+type Liquidation @entity {
+    id: ID!
+    sequenceNumber: Int!
+    transaction: Transaction!
+    liquidator: User!
+
+    liquidatedDebt: BigDecimal!
+    liquidatedCollateral: BigDecimal!
+    collGasCompensation: BigDecimal!
+    tokenGasCompensation: BigDecimal!
+
+    troveChanges: [TroveChange!]! @derivedFrom(field: "liquidation")
 }
 
-type FeeEarnedEntity @entity {
-  id: ID!
+type Redemption @entity {
+    id: ID!
+    sequenceNumber: Int!
+    transaction: Transaction!
+    redeemer: User!
 
-  value: BigInt!
+    tokensAttemptedToRedeem: BigDecimal!
+    tokensActuallyRedeemed: BigDecimal!
+    collateralRedeemed: BigDecimal!
+    partial: Boolean!
+
+    fee: BigDecimal!
+
+    troveChanges: [TroveChange!]! @derivedFrom(field: "redemption")
 }
 
-type FeeEarnedHistoryEntity @entity {
-  id: ID!
+type CollSurplusChange implements Change @entity {
+    id: ID!
+    sequenceNumber: Int!
+    transaction: Transaction!
+    systemStateBefore: SystemState!
+    systemStateAfter: SystemState!
 
-  position: PositionEntity!
-  feeAmount: BigInt!
+    user: User!
 
-  timestamp: BigInt!
-  createAtBlock: BigInt!
+    collSurplusBefore: BigDecimal!
+    collSurplusChange: BigDecimal!
+    collSurplusAfter: BigDecimal!
 }
 
-type PlaftformFeeHistoryEntity @entity {
-  id: ID!
-
-  newFee: BigInt!
-  oldFee: BigInt!
-
-  timestamp: BigInt!
-  createAtBlock: BigInt!
+type LqtyStake @entity {
+    id: ID!
+    owner: User!
+    amount: BigDecimal!
+    changes: [LqtyStakeChange!]! @derivedFrom(field: "stake")
 }
 
-type TvlEntity @entity {
-  id: ID!
-  value: BigDecimal!
-  collateralValue: BigDecimal!
-  bidsValue: BigDecimal!
-  depositTokenValue: BigDecimal!
-  activePositions: [PositionEntity!]
+type LqtyStakeChange implements Change @entity {
+    id: ID!
+    sequenceNumber: Int!
+    transaction: Transaction!
+    systemStateBefore: SystemState!
+    systemStateAfter: SystemState!
+
+    stake: LqtyStake!
+    stakeOperation: LQTYStakeOperation!
+
+    stakedAmountBefore: BigDecimal!
+    stakedAmountChange: BigDecimal!
+    stakedAmountAfter: BigDecimal!
+
+    issuanceGain: BigDecimal!
+    redemptionGain: BigDecimal!
 }
 
-type TvlHistoryEntity @entity {
-  id: ID!
-  value: BigDecimal!
-  collateralValue: BigDecimal!
-  bidsValue: BigDecimal!
-  depositTokenValue: BigDecimal!
-  timestamp: BigInt!
-  createAtBlock: BigInt!
+type Token @entity {
+    id: ID!
+    name: String!
+    symbol: String!
+    totalSupply: BigInt!
+    balances: [TokenBalance!] @derivedFrom(field: "token")
+    allowances: [TokenAllowance!] @derivedFrom(field: "token")
 }
+
+type TokenBalance @entity {
+    id: ID!
+    token: Token!
+    owner: User!
+    balance: BigInt!
+}
+
+type TokenAllowance @entity {
+    id: ID!
+    token: Token!
+    owner: User!
+    spender: User!
+    value: BigInt!
+}
+
+type Frontend @entity {
+    id: ID!
+    owner: User!
+    kickbackRate: BigDecimal!
+    deposits: [StabilityDeposit!]! @derivedFrom(field: "frontend")
+}
+
+enum LQTYStakeOperation {
+    stakeCreated
+    stakeIncreased
+    stakeDecreased
+    stakeRemoved
+    gainsWithdrawn
+}
+

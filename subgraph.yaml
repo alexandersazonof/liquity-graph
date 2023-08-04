@@ -1,54 +1,172 @@
-specVersion: 0.0.4
+specVersion: 0.0.6
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
-    name: PawnShopContract
-    network: mumbai
+  - name: TroveManager
+    kind: ethereum/contract
+    network: mainnet
     source:
-      address: "0xa7521861891808CfD53C65a525E3aB715a57AdD0"
-      abi: PawnShopContract
-      startBlock: 38558229
+      abi: TroveManager
+      address: "0xA39739EF8b0231DbFA0DcdA07d7e29faAbCf4bb2"
+      startBlock: 12178557
     mapping:
+      file: ./src/mappings/TroveManager.ts
+      language: wasm/assemblyscript
       kind: ethereum/events
       apiVersion: 0.0.6
-      language: wasm/assemblyscript
       entities:
-        - AuctionBidAccepted
-        - AuctionBidClosed
-        - AuctionBidOpened
-        - BidExecuted
-        - PositionClaimed
-        - PositionClosed
-        - PositionOpened
-        - PositionRedeemed
-        - UpdateController
+        - Global
+        - User
+        - Transaction
+        - Trove
+        - TroveChange
+        - Redemption
+        - Liquidation
+        - SystemState
       abis:
-        - name: PawnShopContract
-          file: ./abis/PawnShopContract.json
-        - name: ERC20
-          file: ./abis/ERC20Contract.json
-        - name: ERC721
-          file: ./abis/ERC721Contract.json
-        - name: PriceCalculator
-          file: ./abis/PriceCalculator.json
+        - name: TroveManager
+          file: ./abis/TroveManager.json
       eventHandlers:
-        - event: AuctionBidAccepted(indexed address,uint256,uint256)
-          handler: handleAuctionBidAccepted
-        - event: AuctionBidClosed(uint256,uint256)
-          handler: handleAuctionBidClosed
-        - event: AuctionBidOpened(uint256,uint256,uint256,address)
-          handler: handleAuctionBidOpened
-        - event: BidExecuted(uint256,uint256,uint256,address,address)
-          handler: handleBidExecuted
-        - event: PositionClaimed(indexed address,uint256)
-          handler: handlePositionClaimed
-        - event: PositionClosed(indexed address,uint256)
-          handler: handlePositionClosed
-        - event: PositionOpened(indexed address,uint256,address,uint256,uint256,address,uint256,uint256,uint256)
-          handler: handlePositionOpened
-        - event: PositionRedeemed(indexed address,uint256)
-          handler: handlePositionRedeemed
-        - event: PlatformFeeChanged(uint256,uint256)
-          handler: handlePlatformFeeChanged
-      file: ./src/pawn-shop.listener.ts
+        - event: TroveUpdated(indexed address,uint256,uint256,uint256,uint8)
+          handler: handleTroveUpdated
+        - event: TroveLiquidated(indexed address,uint256,uint256,uint8)
+          handler: handleTroveLiquidated
+        - event: Liquidation(uint256,uint256,uint256,uint256)
+          handler: handleLiquidation
+        - event: Redemption(uint256,uint256,uint256,uint256)
+          handler: handleRedemption
+        - event: LTermsUpdated(uint256,uint256)
+          handler: handleLTermsUpdated
+  - name: BorrowerOperations
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: BorrowerOperations
+      address: "0x24179CD81c9e782A4096035f7eC97fB8B783e007"
+      startBlock: 12178583
+    mapping:
+      file: ./src/mappings/BorrowerOperations.ts
+      language: wasm/assemblyscript
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      entities:
+        - Global
+        - User
+        - Transaction
+        - Trove
+        - TroveChange
+        - SystemState
+      abis:
+        - name: BorrowerOperations
+          file: ./abis/BorrowerOperations.json
+      eventHandlers:
+        - event: TroveUpdated(indexed address,uint256,uint256,uint256,uint8)
+          handler: handleTroveUpdated
+        - event: LUSDBorrowingFeePaid(indexed address,uint256)
+          handler: handleLUSDBorrowingFeePaid
+  - name: PriceFeed
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: PriceFeed
+      address: "0x4c517D4e2C851CA76d7eC94B805269Df0f2201De"
+      startBlock: 12178552
+    mapping:
+      file: ./src/mappings/PriceFeed.ts
+      language: wasm/assemblyscript
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      entities:
+        - Global
+        - Transaction
+        - PriceChange
+        - SystemState
+      abis:
+        - name: PriceFeed
+          file: ./abis/PriceFeed.json
+      eventHandlers:
+        - event: LastGoodPriceUpdated(uint256)
+          handler: handleLastGoodPriceUpdated
+  - name: StabilityPool
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StabilityPool
+      address: "0x66017D22b0f8556afDd19FC67041899Eb65a21bb"
+      startBlock: 12178566
+    mapping:
+      file: ./src/mappings/StabilityPool.ts
+      language: wasm/assemblyscript
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      entities:
+        - Global
+        - User
+        - Transaction
+        - StabilityDeposit
+        - StabilityDepositChange
+        - SystemState
+        - Frontend
+      abis:
+        - name: StabilityPool
+          file: ./abis/StabilityPool.json
+      eventHandlers:
+        - event: UserDepositChanged(indexed address,uint256)
+          handler: handleUserDepositChanged
+        - event: ETHGainWithdrawn(indexed address,uint256,uint256)
+          handler: handleETHGainWithdrawn
+        - event: FrontEndRegistered(indexed address,uint256)
+          handler: handleFrontendRegistered
+        - event: FrontEndTagSet(indexed address,indexed address)
+          handler: handleFrontendTagSet
+  - name: CollSurplusPool
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: CollSurplusPool
+      address: "0x3D32e8b97Ed5881324241Cf03b2DA5E2EBcE5521"
+      startBlock: 	12178579
+    mapping:
+      file: ./src/mappings/CollSurplusPool.ts
+      language: wasm/assemblyscript
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      entities:
+        - Global
+        - User
+        - Transaction
+        - Trove
+        - CollSurplusChange
+        - SystemState
+      abis:
+        - name: CollSurplusPool
+          file: ./abis/CollSurplusPool.json
+      eventHandlers:
+        - event: CollBalanceUpdated(indexed address,uint256)
+          handler: handleCollSurplusBalanceUpdated
+  - name: LQTYStaking
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: LQTYStaking
+      address: "0x4f9Fbb3f1E99B56e0Fe2892e623Ed36A76Fc605d"
+      startBlock: 12178608
+    mapping:
+      file: ./src/mappings/LqtyStake.ts
+      language: wasm/assemblyscript
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      entities:
+        - Global
+        - User
+        - Transaction
+        - LqtyStake
+        - LqtyStakeChange
+      abis:
+        - name: LQTYStaking
+          file: ./abis/LQTYStaking.json
+      eventHandlers:
+        - event: StakeChanged(indexed address,uint256)
+          handler: handleStakeChanged
+        - event: StakingGainsWithdrawn(indexed address,uint256,uint256)
+          handler: handleStakeGainsWithdrawn

@@ -1,13 +1,11 @@
 {
-  "name": "pawnshop",
+  "name": "app",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ tetu-io/pawnshop-polygon",
-    "create-local": "graph create --node http://localhost:8020/ tetu-io/pawnshop",
-    "remove-local": "graph remove --node http://localhost:8020/ tetu-io/pawnshop",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 tetu-io/pawnshop"
+    "prepare": "graph codegen && graph build",
+    "deploy": "graph deploy --product hosted-service alexandersazonof/liquity"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.53.0",
