@@ -2,6 +2,7 @@ import { Value, BigInt } from "@graphprotocol/graph-ts";
 
 
 import { BIGINT_ZERO, DECIMAL_ZERO, decimalize } from "../utils/bignumbers";
+import { Global } from '../../generated/schema';
 
 const onlyGlobalId = "only";
 

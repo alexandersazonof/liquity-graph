@@ -56,7 +56,7 @@ export function handleETHGainWithdrawn(event: ETHGainWithdrawn): void {
     event.params._LUSDLoss
   );
 
-  if (depositUpdate != null) {
+  if (depositUpdate) {
     updateStabilityDeposit(event, event.params._depositor, depositUpdate as BigInt);
   }
 }
