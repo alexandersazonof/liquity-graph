@@ -16,11 +16,11 @@ import { updateTotalRedistributed } from "../entities/Global";
 export function handleTroveUpdated(event: TroveUpdated): void {
   updateTrove(
     event,
-    getTroveOperationFromTroveManagerOperation(event.params._operation),
+    getTroveOperationFromTroveManagerOperation(event.params.operation),
     event.params._borrower,
     event.params._coll,
     event.params._debt,
-    event.params._stake
+    event.params.stake
   );
 }
 
@@ -36,20 +36,19 @@ export function handleLiquidation(event: Liquidation): void {
     event.params._liquidatedColl,
     event.params._liquidatedDebt,
     event.params._collGasCompensation,
-    event.params._LUSDGasCompensation
   );
 }
 
 export function handleRedemption(event: Redemption): void {
   finishCurrentRedemption(
     event,
-    event.params._attemptedLUSDAmount,
-    event.params._actualLUSDAmount,
-    event.params._ETHSent,
-    event.params._ETHFee
+    event.params._attemptedSIMAmount,
+    event.params._actualSIMAmount,
+    event.params._WSTETHSent,
+    event.params._WSTETHFee
   );
 }
 
 export function handleLTermsUpdated(event: LTermsUpdated): void {
-  updateTotalRedistributed(event.params._L_ETH, event.params._L_LUSDDebt);
+  updateTotalRedistributed(event.params._L_WSTETH, event.params._L_SIMDebt);
 }

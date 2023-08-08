@@ -1,3 +1,7 @@
+# noinspection GraphQLMissingType
+
+# derivedFrom doc https://thegraph.com/docs/en/developer/create-subgraph-hosted/#reverse-lookups
+
 type Global @entity {
     "There should be only one System entity with an ID of 'only'"
     id: ID!
@@ -57,7 +61,7 @@ type SystemState @entity {
     collSurplusPoolBalance: BigDecimal!
     totalLQTYTokensStaked: BigDecimal!
 
-    cause: Change @derivedFrom(field: "systemStateAfter")
+#    cause: Change @derivedFrom(field: "systemStateAfter")
 }
 
 type User @entity {
@@ -137,7 +141,7 @@ type Transaction @entity {
     "Timestamp of block that included this transaction (seconds since epoch)"
     timestamp: Int!
 
-    changes: [Change!]! @derivedFrom(field: "transaction")
+#    changes: [Change!]! @derivedFrom(field: "transaction")
 }
 
 interface Change {
@@ -234,7 +238,6 @@ type Liquidation @entity {
     liquidatedDebt: BigDecimal!
     liquidatedCollateral: BigDecimal!
     collGasCompensation: BigDecimal!
-    tokenGasCompensation: BigDecimal!
 
     troveChanges: [TroveChange!]! @derivedFrom(field: "liquidation")
 }

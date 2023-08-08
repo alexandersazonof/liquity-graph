@@ -4,11 +4,11 @@ schema:
 dataSources:
   - name: TroveManager
     kind: ethereum/contract
-    network: mainnet
+    network: polygon-zkevm-testnet
     source:
       abi: TroveManager
-      address: "0xA39739EF8b0231DbFA0DcdA07d7e29faAbCf4bb2"
-      startBlock: 12178557
+      address: "0x4D7D07196E24D15d8E5B97216aeDCf4518b23A66"
+      startBlock: 1960743
     mapping:
       file: ./src/mappings/TroveManager.ts
       language: wasm/assemblyscript
@@ -31,7 +31,7 @@ dataSources:
           handler: handleTroveUpdated
         - event: TroveLiquidated(indexed address,uint256,uint256,uint8)
           handler: handleTroveLiquidated
-        - event: Liquidation(uint256,uint256,uint256,uint256)
+        - event: Liquidation(uint256,uint256,uint256)
           handler: handleLiquidation
         - event: Redemption(uint256,uint256,uint256,uint256)
           handler: handleRedemption
@@ -39,11 +39,11 @@ dataSources:
           handler: handleLTermsUpdated
   - name: BorrowerOperations
     kind: ethereum/contract
-    network: mainnet
+    network: polygon-zkevm-testnet
     source:
       abi: BorrowerOperations
-      address: "0x24179CD81c9e782A4096035f7eC97fB8B783e007"
-      startBlock: 12178583
+      address: "0x3fa5F9c876BEbB41B8924633850b1a9922f7E4F9"
+      startBlock: 1960817
     mapping:
       file: ./src/mappings/BorrowerOperations.ts
       language: wasm/assemblyscript
@@ -62,15 +62,15 @@ dataSources:
       eventHandlers:
         - event: TroveUpdated(indexed address,uint256,uint256,uint256,uint8)
           handler: handleTroveUpdated
-        - event: LUSDBorrowingFeePaid(indexed address,uint256)
-          handler: handleLUSDBorrowingFeePaid
+        - event: SIMBorrowingFeePaid(indexed address,uint256)
+          handler: handleSIMBorrowingFeePaid
   - name: PriceFeed
     kind: ethereum/contract
-    network: mainnet
+    network: polygon-zkevm-testnet
     source:
       abi: PriceFeed
-      address: "0x4c517D4e2C851CA76d7eC94B805269Df0f2201De"
-      startBlock: 12178552
+      address: "0x48469a0481254d5945E7E56c1Eb9861429c02f44"
+      startBlock: 1961056
     mapping:
       file: ./src/mappings/PriceFeed.ts
       language: wasm/assemblyscript
@@ -89,11 +89,11 @@ dataSources:
           handler: handleLastGoodPriceUpdated
   - name: StabilityPool
     kind: ethereum/contract
-    network: mainnet
+    network: polygon-zkevm-testnet
     source:
       abi: StabilityPool
-      address: "0x66017D22b0f8556afDd19FC67041899Eb65a21bb"
-      startBlock: 12178566
+      address: "0x108aBca337e88a9fc1DE96b0ec323f476b35cD44"
+      startBlock: 1960743
     mapping:
       file: ./src/mappings/StabilityPool.ts
       language: wasm/assemblyscript
@@ -113,19 +113,19 @@ dataSources:
       eventHandlers:
         - event: UserDepositChanged(indexed address,uint256)
           handler: handleUserDepositChanged
-        - event: ETHGainWithdrawn(indexed address,uint256,uint256)
-          handler: handleETHGainWithdrawn
+        - event: WSTETHGainWithdrawn(indexed address,uint256,uint256)
+          handler: handleWSTETHGainWithdrawn
         - event: FrontEndRegistered(indexed address,uint256)
           handler: handleFrontendRegistered
         - event: FrontEndTagSet(indexed address,indexed address)
           handler: handleFrontendTagSet
   - name: CollSurplusPool
     kind: ethereum/contract
-    network: mainnet
+    network: polygon-zkevm-testnet
     source:
       abi: CollSurplusPool
-      address: "0x3D32e8b97Ed5881324241Cf03b2DA5E2EBcE5521"
-      startBlock: 	12178579
+      address: "0x7f1Ea9A4986F354372c49826e28E733693f4f577"
+      startBlock: 1960821
     mapping:
       file: ./src/mappings/CollSurplusPool.ts
       language: wasm/assemblyscript
@@ -144,15 +144,15 @@ dataSources:
       eventHandlers:
         - event: CollBalanceUpdated(indexed address,uint256)
           handler: handleCollSurplusBalanceUpdated
-  - name: LQTYStaking
+  - name: Ve
     kind: ethereum/contract
-    network: mainnet
+    network: polygon-zkevm-testnet
     source:
-      abi: LQTYStaking
-      address: "0x4f9Fbb3f1E99B56e0Fe2892e623Ed36A76Fc605d"
-      startBlock: 12178608
+      abi: Ve
+      address: "0xDFd33dF050c85B9efB3D3601456e2BdD4659ABCC"
+      startBlock: 1961065
     mapping:
-      file: ./src/mappings/LqtyStake.ts
+      file: ./src/mappings/Ve.ts
       language: wasm/assemblyscript
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -160,13 +160,9 @@ dataSources:
         - Global
         - User
         - Transaction
-        - LqtyStake
-        - LqtyStakeChange
       abis:
-        - name: LQTYStaking
-          file: ./abis/LQTYStaking.json
+        - name: Ve
+          file: ./abis/Ve.json
       eventHandlers:
-        - event: StakeChanged(indexed address,uint256)
-          handler: handleStakeChanged
-        - event: StakingGainsWithdrawn(indexed address,uint256,uint256)
-          handler: handleStakeGainsWithdrawn
+        - event: Merged(indexed address,indexed address,uint256,uint256)
+          handler: handleMerged
