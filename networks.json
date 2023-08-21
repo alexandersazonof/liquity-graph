@@ -24,5 +24,31 @@
       "address": "0xDFd33dF050c85B9efB3D3601456e2BdD4659ABCC",
       "startBlock": 1961065
     }
+  },
+  "goerli": {
+    "TroveManager": {
+      "address": "0x67952505E536A83C4916a3F44728DE92e0E3EBBc",
+      "startBlock": 9508055
+    },
+    "BorrowerOperations": {
+      "address": "0x960FdE8a92d5Ad1245E7AD267641F230d9a39Df1",
+      "startBlock": 9508055
+    },
+    "PriceFeed": {
+      "address": "0xcF05bE25600286AB922c4Ea4cf160Af2d4916470",
+      "startBlock": 9508055
+    },
+    "StabilityPool": {
+      "address": "0x74bBa28c13771FB32eD08e5522dfEc71ea8De48c",
+      "startBlock": 9508055
+    },
+    "CollSurplusPool": {
+      "address": "0x1329Ea1d522714Ae9Cd18543e78926F71EbC0Aa0",
+      "startBlock": 9508055
+    },
+    "Ve": {
+      "address": "0xB8876314f368868a2302eC95d78A623c926C5c61",
+      "startBlock": 9508055
+    }
   }
 }

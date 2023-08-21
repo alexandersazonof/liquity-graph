@@ -5,6 +5,7 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "prepare": "graph codegen && graph build --network matic",
+    "prepare:goerli": "graph codegen && graph build --network goerli",
     "prepare:test": "graph codegen && graph build --network polygon-zkevm-testnet",
     "deploy": "graph deploy --product hosted-service alexandersazonof/liquity"
   },

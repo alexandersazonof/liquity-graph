@@ -4,11 +4,11 @@ schema:
 dataSources:
   - name: TroveManager
     kind: ethereum/contract
-    network: polygon-zkevm-testnet
+    network: goerli
     source:
       abi: TroveManager
-      address: "0x4D7D07196E24D15d8E5B97216aeDCf4518b23A66"
-      startBlock: 1960743
+      address: "0x67952505E536A83C4916a3F44728DE92e0E3EBBc"
+      startBlock: 9508055
     mapping:
       file: ./src/mappings/TroveManager.ts
       language: wasm/assemblyscript
@@ -39,11 +39,11 @@ dataSources:
           handler: handleLTermsUpdated
   - name: BorrowerOperations
     kind: ethereum/contract
-    network: polygon-zkevm-testnet
+    network: goerli
     source:
       abi: BorrowerOperations
-      address: "0x3fa5F9c876BEbB41B8924633850b1a9922f7E4F9"
-      startBlock: 1960817
+      address: "0x960FdE8a92d5Ad1245E7AD267641F230d9a39Df1"
+      startBlock: 9508055
     mapping:
       file: ./src/mappings/BorrowerOperations.ts
       language: wasm/assemblyscript
@@ -66,11 +66,11 @@ dataSources:
           handler: handleSIMBorrowingFeePaid
   - name: PriceFeed
     kind: ethereum/contract
-    network: polygon-zkevm-testnet
+    network: goerli
     source:
       abi: PriceFeed
-      address: "0x48469a0481254d5945E7E56c1Eb9861429c02f44"
-      startBlock: 1961056
+      address: "0xcF05bE25600286AB922c4Ea4cf160Af2d4916470"
+      startBlock: 9508055
     mapping:
       file: ./src/mappings/PriceFeed.ts
       language: wasm/assemblyscript
@@ -89,11 +89,11 @@ dataSources:
           handler: handleLastGoodPriceUpdated
   - name: StabilityPool
     kind: ethereum/contract
-    network: polygon-zkevm-testnet
+    network: goerli
     source:
       abi: StabilityPool
-      address: "0x108aBca337e88a9fc1DE96b0ec323f476b35cD44"
-      startBlock: 1960743
+      address: "0x74bBa28c13771FB32eD08e5522dfEc71ea8De48c"
+      startBlock: 9508055
     mapping:
       file: ./src/mappings/StabilityPool.ts
       language: wasm/assemblyscript
@@ -121,11 +121,11 @@ dataSources:
           handler: handleFrontendTagSet
   - name: CollSurplusPool
     kind: ethereum/contract
-    network: polygon-zkevm-testnet
+    network: goerli
     source:
       abi: CollSurplusPool
-      address: "0x7f1Ea9A4986F354372c49826e28E733693f4f577"
-      startBlock: 1960821
+      address: "0x1329Ea1d522714Ae9Cd18543e78926F71EbC0Aa0"
+      startBlock: 9508055
     mapping:
       file: ./src/mappings/CollSurplusPool.ts
       language: wasm/assemblyscript
@@ -146,11 +146,11 @@ dataSources:
           handler: handleCollSurplusBalanceUpdated
   - name: Ve
     kind: ethereum/contract
-    network: polygon-zkevm-testnet
+    network: goerli
     source:
       abi: Ve
-      address: "0xDFd33dF050c85B9efB3D3601456e2BdD4659ABCC"
-      startBlock: 1961065
+      address: "0xB8876314f368868a2302eC95d78A623c926C5c61"
+      startBlock: 9508055
     mapping:
       file: ./src/mappings/Ve.ts
       language: wasm/assemblyscript
